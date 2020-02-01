@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TinyCrm.Model;
 using TinyCrm.Model.Options;
@@ -50,6 +49,7 @@ namespace TinyCrm.Services
 
             return true;
         }
+
         public bool UpdateProduct(string productId, 
             UpdateProductOptions options)
         {
@@ -90,6 +90,7 @@ namespace TinyCrm.Services
 
             return true;
         }
+
         public Product GetProductById(string productId)
         {
             if(string.IsNullOrWhiteSpace(productId)) {

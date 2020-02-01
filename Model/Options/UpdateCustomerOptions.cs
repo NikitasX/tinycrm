@@ -1,14 +1,7 @@
-﻿using System;
-
-namespace TinyCrm.Model
+﻿namespace TinyCrm.Model.Options
 {
-    public class Customer
+    public class UpdateCustomerOptions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Id { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -38,10 +31,5 @@ namespace TinyCrm.Model
         /// 
         /// </summary>
         public int? Status { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public DateTime DateCreated { get; set; }
     }
 }

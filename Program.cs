@@ -33,6 +33,7 @@ namespace TinyCrm
                 ProductCategory = ProductCategory.Cameras,
                 Name = "Camera 2"
             });
+
             productService.UpdateProduct("123", new UpdateProductOptions()
             {
                 Price = 22.22M
