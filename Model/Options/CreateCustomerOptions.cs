@@ -1,4 +1,6 @@
-﻿namespace TinyCrm.Model.Options
+﻿using System;
+
+namespace TinyCrm.Model.Options
 {
     public class CreateCustomerOptions
     {
@@ -16,5 +18,11 @@
         /// 
         /// </summary>
         public string Email { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public DateTime DateCreated { get; set; }
+
     }
 }

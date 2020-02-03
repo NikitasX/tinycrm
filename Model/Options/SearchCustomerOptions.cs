@@ -3,7 +3,7 @@
 namespace TinyCrm.Model.Options
 {
     public class SearchCustomerOptions
-    {
+    { 
         /// <summary>
         /// 
         /// </summary>

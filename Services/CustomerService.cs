@@ -85,12 +85,17 @@ namespace TinyCrm.Services
 
         public Customer GetCustomerById(int customerId)
         {
+
+            if (CustomerList == null) {
+                throw new ArgumentNullException("Customer List is empty");
+            }
+
             if (customerId < 0) {
                 return default;
             }
 
             return CustomerList
-                .Where(s => s.Id.Equals(customerId))
+                .Where(s => s.Id == customerId)
                 .SingleOrDefault();
         }
 

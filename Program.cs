@@ -1,4 +1,5 @@
-﻿using TinyCrm.Model;
+﻿using System;
+using TinyCrm.Model;
 using TinyCrm.Model.Options;
 using TinyCrm.Services;
 
@@ -8,36 +9,22 @@ namespace TinyCrm
     {
         static void Main(string[] args)
         {
-            //Log.Logger = new LoggerConfiguration()
-            //    .WriteTo.Console()
-            //    .WriteTo.File($@"{System.IO.Directory.GetCurrentDirectory()}\logs\{DateTime.Now:yyyy-MM-dd}\log-.txt",
-            //        rollingInterval: RollingInterval.Day)
-            //    .CreateLogger();
-            //Log.Error("this is an error");
-            //Console.ReadKey();
+            var test = new CustomerService();
 
-            var productService = new ProductService();
+            var temp = new CreateCustomerOptions() {
+                Id = 1,
+                Email = "test@test.com",
+                VatNumber = "test",
+                DateCreated = DateTime.Now
+            };
 
-            productService.AddProduct(new AddProductOptions()
-            {
-                Id = "123",
-                Price = 12.33M,
-                ProductCategory = ProductCategory.Cameras,
-                Name = "Camera 1"
-            });            
-            
-            productService.AddProduct(new AddProductOptions()
-            {
-                Id = "456",
-                Price = 12.33M,
-                ProductCategory = ProductCategory.Cameras,
-                Name = "Camera 2"
-            });
+            var lalala = test.CreateCustomer(temp);
 
-            productService.UpdateProduct("123", new UpdateProductOptions()
-            {
-                Price = 22.22M
-            });
+            var ok = test.GetCustomerById(1);
+
+            Console.WriteLine(ok.Email);
+
+            Console.ReadLine();
         }
     }
 }
