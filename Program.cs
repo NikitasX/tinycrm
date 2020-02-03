@@ -9,28 +9,43 @@ namespace TinyCrm
     {
         static void Main(string[] args)
         {
-            var test = new CustomerService();
+            var customerService = new CustomerService();
 
-            var temp = new CreateCustomerOptions() {
+            var createOptions = new CreateCustomerOptions() {
                 Id = 1,
                 Email = "test@test.com",
                 VatNumber = "test",
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.Now,
+                Status = 15
             };
 
-            var lalala = test.CreateCustomer(temp);
+            var createCustomer = customerService.CreateCustomer(createOptions);
 
-            var kakaka = new UpdateCustomerOptions()
+            var updateCustomer = new UpdateCustomerOptions()
             {
                 Email = "lala@lala.com"
             };
 
-            var okUpdate = test.UpdateCustomer(1, kakaka);
+            var okUpdate = customerService.UpdateCustomer(1, updateCustomer);
 
-            var ok = test.GetCustomerById(1);
+            var customerById = customerService.GetCustomerById(1);
 
-            Console.WriteLine(ok.Email);
-            Console.WriteLine(ok.VatNumber);
+            Console.WriteLine(customerById.Email);
+            Console.WriteLine(customerById.VatNumber);
+            Console.WriteLine(customerById.Status);
+
+            var searchOptions = new SearchCustomerOptions()
+            {
+                Email = "lala"
+            };
+
+            var search = customerService.SearchCustomer(searchOptions);
+
+            Console.WriteLine(search.Count);
+
+            foreach(var c in search) {
+                Console.WriteLine(c.Email);
+            }
 
             Console.ReadLine();
         }

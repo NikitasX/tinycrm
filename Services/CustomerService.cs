@@ -35,7 +35,7 @@ namespace TinyCrm.Services
                 VatNumber = options.VatNumber,
                 Email = options.Email,
                 DateCreated = DateTime.UtcNow,
-                Status = 1
+                Status = options.Status
             };
 
             CustomerList.Add(customer);
@@ -108,15 +108,18 @@ namespace TinyCrm.Services
             var customer = CustomerList
                 .Where(s => s.Status == 1);
 
-            if(string.IsNullOrWhiteSpace(options.Email)) {
+            if(!string.IsNullOrWhiteSpace(options.Email)
+                && customer.ToList().Count != 0) {
                 customer = customer.Where(s => s.Email.Contains(options.Email));
             }
 
-            if(string.IsNullOrWhiteSpace(options.VatNumber)) {
+            if(!string.IsNullOrWhiteSpace(options.VatNumber)
+                && customer.ToList().Count != 0) {
                 customer = customer.Where(s => s.VatNumber.Contains(options.VatNumber));
             }
 
-            if (options.DateCreated != null) {
+            if (options.DateCreated != null 
+                && customer.ToList().Count != 0) {
                 customer = customer.Where(s => s.DateCreated < options.DateCreated);
             }
 

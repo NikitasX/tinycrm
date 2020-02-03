@@ -24,5 +24,9 @@ namespace TinyCrm.Model.Options
         /// </summary>
         public DateTime DateCreated { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public int? Status { get; set; }
     }
 }
