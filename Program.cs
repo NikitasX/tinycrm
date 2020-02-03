@@ -20,9 +20,17 @@ namespace TinyCrm
 
             var lalala = test.CreateCustomer(temp);
 
+            var kakaka = new UpdateCustomerOptions()
+            {
+                Email = "lala@lala.com"
+            };
+
+            var okUpdate = test.UpdateCustomer(1, kakaka);
+
             var ok = test.GetCustomerById(1);
 
             Console.WriteLine(ok.Email);
+            Console.WriteLine(ok.VatNumber);
 
             Console.ReadLine();
         }
