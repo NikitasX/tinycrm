@@ -7,7 +7,7 @@ namespace TinyCrm.Core.Services
 {
     public class ProductService : IProductService
     {
-        private List<Product> ProductsList = new List<Product>();
+        private static List<Product> ProductsList = new List<Product>();
 
         public bool AddProduct(AddProductOptions options)
         {

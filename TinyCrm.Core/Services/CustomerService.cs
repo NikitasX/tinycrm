@@ -8,7 +8,7 @@ namespace TinyCrm.Core.Services
 {
     public class CustomerService : ICustomerService
     {
-        private List<Customer> CustomerList = new List<Customer>();
+        private static List<Customer> CustomerList = new List<Customer>();
 
         public bool CreateCustomer(CreateCustomerOptions options)
         {
@@ -85,10 +85,6 @@ namespace TinyCrm.Core.Services
 
         public Customer GetCustomerById(int customerId)
         {
-
-            if (CustomerList == null) {
-                throw new ArgumentNullException("Customer List is empty");
-            }
 
             if (customerId < 0) {
                 return default;

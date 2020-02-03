@@ -9,7 +9,7 @@ namespace TinyCrm.Core.Services
     public class OrderService : IOrderService
     {
 
-        private List<Order> OrderList = new List<Order>();
+        private static List<Order> OrderList = new List<Order>();
 
         private int AIID = 0;
 
@@ -23,13 +23,13 @@ namespace TinyCrm.Core.Services
             var customerCheck = new CustomerService();
             var customer = customerCheck.GetCustomerById(customerId);
 
-            if(customer == default(Customer) ||
+            if(customer == null ||
                 customer.Status == 0) {
                 throw new ApplicationException(
                     $"Customer not found or Inactive");
             }
 
-            if(productList == null) {
+            if(productList.Count == 0) {
                 throw new ArgumentNullException(
                     $"{nameof(productList)} cannot be empty");
             }
@@ -38,8 +38,8 @@ namespace TinyCrm.Core.Services
             var i = 0;
 
             decimal amount = 0;
-
-            foreach(var p in productList) {
+            
+            foreach(var p in productList.ToList()) {
                 if(pService.GetProductById(p.Id) == default) {
                     productList.RemoveAt(i);
                 } else {
@@ -48,7 +48,7 @@ namespace TinyCrm.Core.Services
                 i++;
             }
 
-            if(productList == null) {
+            if(productList.Count == 0) {
                 throw new ArgumentNullException(
                     $"Products submitted in {nameof(productList)} " +
                     $"not found in Products database");
@@ -95,7 +95,8 @@ namespace TinyCrm.Core.Services
                 order.DeliveryAdress = options.DeliveryAdress;
             }
 
-            if (options.Products != null) {
+            if (options.Products != null &&
+                options.Products.Count != 0) {
                 decimal amount = 0;
                 
                 foreach(var p in options.Products) {
