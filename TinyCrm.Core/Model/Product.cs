@@ -1,35 +1,35 @@
-﻿namespace TinyCrm.Model.Options
+﻿namespace TinyCrm.Core.Model
 {
-    public class UpdateCustomerOptions
+    public class Product
     {
         /// <summary>
         /// 
         /// </summary>
-        public string Phone { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Email { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Lastname { get; set; }
+        public decimal Price { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string VatNumber { get; set; }
+        public decimal Discount { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Firstname { get; set; }
+        public string Description { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int? Status { get; set; }
+        public ProductCategory Category{ get; set; }
     }
 }

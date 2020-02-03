@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyCrm.Model
+namespace TinyCrm.Core.Model
 {
     public class Customer
     {

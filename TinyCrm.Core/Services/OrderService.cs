@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TinyCrm.Model;
-using TinyCrm.Model.Options;
+using TinyCrm.Core.Model;
+using TinyCrm.Core.Model.Options;
 
-namespace TinyCrm.Services
+namespace TinyCrm.Core.Services
 {
     public class OrderService : IOrderService
     {

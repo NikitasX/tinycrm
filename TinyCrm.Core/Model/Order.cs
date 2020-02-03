@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TinyCrm.Model
+namespace TinyCrm.Core.Model
 {
     public class Order
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyCrm.Model.Options
+namespace TinyCrm.Core.Model.Options
 {
     public class SearchCustomerOptions
     { 
