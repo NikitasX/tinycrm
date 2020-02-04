@@ -43,5 +43,14 @@ namespace TinyCrm.Core.Model
         /// 
         /// </summary>
         public DateTimeOffset Created { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Customer()
+        {
+            Created = DateTimeOffset.Now;
+        }
+
     }
 }

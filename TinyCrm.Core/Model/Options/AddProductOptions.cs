@@ -20,6 +20,16 @@
         /// <summary>
         /// 
         /// </summary>
-        public ProductCategory ProductCategory { get; set; }
+        public decimal Discount { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ProductCategory Category { get; set; }
     }
 }

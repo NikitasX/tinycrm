@@ -1,14 +1,7 @@
-﻿using System;
-
-namespace TinyCrm.Core.Model.Options
+﻿namespace TinyCrm.Core.Model.Options
 {
     public class CreateCustomerOptions
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Id { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -17,16 +10,21 @@ namespace TinyCrm.Core.Model.Options
         /// <summary>
         /// 
         /// </summary>
-        public string Email { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public DateTime Created { get; set; }
+        public string Phone { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int? Status { get; set; }
+        public string Email { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Lastname { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Firstname { get; set; }
     }
 }

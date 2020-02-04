@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TinyCrm.Core.Data;
-using TinyCrm.Core.Model;
-using TinyCrm.Core.Model.Options;
-using TinyCrm.Core.Services;
+﻿using TinyCrm.Core.Data;
 
 namespace TinyCrm
 {
@@ -12,6 +6,8 @@ namespace TinyCrm
     {
         static void Main(string[] args)
         {
+            using (var context = new TinyCrmDbContext()) {
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 
@@ -7,7 +9,17 @@ namespace TinyCrm.Core.Services
 {
     public class ProductService : IProductService
     {
-        private static List<Product> ProductsList = new List<Product>();
+        private readonly TinyCrmDbContext context;
+
+        public ProductService(TinyCrmDbContext ctx) 
+        {
+            context = ctx 
+                ?? throw new ArgumentNullException(nameof(ctx));
+        }        
+        
+        public ProductService() 
+        {
+        }
 
         public bool AddProduct(AddProductOptions options)
         {
@@ -33,7 +45,7 @@ namespace TinyCrm.Core.Services
                 return false;
             }
 
-            if (options.ProductCategory == ProductCategory.Invalid) {
+            if (options.Category == ProductCategory.Invalid) {
                 return false;
             }
 
@@ -42,12 +54,22 @@ namespace TinyCrm.Core.Services
                 Id = options.Id,
                 Name = options.Name,
                 Price = options.Price,
-                Category = options.ProductCategory
+                Discount = options.Discount,
+                Description = options.Description,
+                Category = options.Category
             };
 
-            ProductsList.Add(product);
+            context.Add(product);
 
-            return true;
+            var success = false;
+
+            try {
+                success = context.SaveChanges() > 0;
+            } catch (Exception e) {
+                //
+            }
+
+            return success;
         }
 
         public bool UpdateProduct(string productId, 
@@ -68,27 +90,99 @@ namespace TinyCrm.Core.Services
                 return false;
             }
 
+            if (!string.IsNullOrWhiteSpace(options.Name)) {
+                product.Name = options.Name;
+            }
+
+            if (options.Price > 0) {
+                product.Price = options.Price;
+            }
+            
+            if(options.Discount > 0) {
+                product.Discount = options.Discount;
+            }
+
             if (!string.IsNullOrWhiteSpace(options.Description)) {
                 product.Description = options.Description;
             }
 
-            if(options.Price != null) {
-                if(options.Price <= 0) {
-                    return false;
-                } else {
-                    product.Price = options.Price.Value;
-                }
-            }     
-            
-            if (options.Discount != null){
-                if(options.Discount <= 0) {
-                    return false;
-                } else {
-                    product.Discount = options.Discount.Value;
-                }
+            if(options.Category != ProductCategory.Invalid) {
+                product.Category = options.Category;
             }
 
-            return true;
+            context.Update(product);
+
+            var success = false;
+
+            try {
+                success = context.SaveChanges() > 0;
+            } catch (Exception e) {
+                //
+            }
+
+            return success;
+        }
+
+        public List<Product> SearchProduct(SearchProductOptions options)
+        {
+            if (options == null) {
+                return default;
+            }
+
+            var productList = context.Set<Product>()
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(options.Id)) {
+                productList = productList
+                    .Where(p => p.Id == options.Id)
+                    .ToList();
+
+                return productList;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.Name)) {
+                productList = productList
+                    .Where(p => p.Name.Contains(options.Name))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.Description)) {
+                productList = productList
+                    .Where(p => p.Description.Contains(options.Description))
+                    .ToList();
+            }
+
+            if (options.Category != ProductCategory.Invalid) {
+                productList = productList
+                    .Where(p => p.Category == options.Category)
+                    .ToList();
+            }
+
+            if (options.MinPrice != 0) {
+                productList = productList
+                    .Where(p => p.Price > options.MinPrice)
+                    .ToList();
+            }
+
+            if (options.MaxPrice != 0) {
+                productList = productList
+                    .Where(p => p.Price < options.MaxPrice)
+                    .ToList();
+            }
+
+            if (options.MinDiscount != 0) {
+                productList = productList
+                    .Where(p => p.Discount > options.MinDiscount)
+                    .ToList();
+            }
+
+            if (options.MaxDiscount != 0) {
+                productList = productList
+                    .Where(p => p.Discount < options.MaxDiscount)
+                    .ToList();
+            }
+
+            return productList;
         }
 
         public Product GetProductById(string productId)
@@ -97,9 +191,11 @@ namespace TinyCrm.Core.Services
                 return default;
             }
             
-            return ProductsList
-                .Where(s => s.Id.Equals(productId))
-                .SingleOrDefault();
+            return SearchProduct(
+                new SearchProductOptions() { 
+                    Id = productId
+                }
+            ).SingleOrDefault();
         }
     }
 }

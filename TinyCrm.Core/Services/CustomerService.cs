@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 
@@ -8,7 +9,18 @@ namespace TinyCrm.Core.Services
 {
     public class CustomerService : ICustomerService
     {
-        private static List<Customer> CustomerList = new List<Customer>();
+
+        private readonly TinyCrmDbContext context;
+
+        public CustomerService(TinyCrmDbContext ctx)
+        {
+            context = ctx
+                ?? throw new ArgumentNullException(nameof(ctx));
+        }
+
+        public CustomerService()
+        {
+        }
 
         public bool CreateCustomer(CreateCustomerOptions options)
         {
@@ -18,29 +30,33 @@ namespace TinyCrm.Core.Services
             }
 
             if(string.IsNullOrWhiteSpace(options.Email) ||
-                string.IsNullOrWhiteSpace(options.VatNumber) || 
-                options.Id < 0) {
+                string.IsNullOrWhiteSpace(options.VatNumber) ||
+                string.IsNullOrWhiteSpace(options.Lastname)) {
                 return false;
             }
 
-            var customer = GetCustomerById(options.Id);
-
-            if(customer != null) {
-                return false;
-            }
-
-            customer = new Customer()
+            var customer = new Customer()
             {
-                Id = options.Id,
                 VatNumber = options.VatNumber,
+                Phone = options.Phone,
                 Email = options.Email,
+                Firstname = options.Firstname,
+                Lastname = options.Lastname,
                 Created = DateTime.UtcNow,
-                Status = options.Status
+                Status = 1
             };
 
-            CustomerList.Add(customer);
+            context.Add(customer);
 
-            return true;
+            var success = false;
+
+            try {
+                success = context.SaveChanges() > 0;
+            } catch (Exception e) {
+                //
+            }
+
+            return success;
         }
 
         public bool UpdateCustomer(int customerId, UpdateCustomerOptions options)
@@ -68,19 +84,29 @@ namespace TinyCrm.Core.Services
                 customer.Status = options.Status;
             }
 
-            if(options.Firstname != null) {
+            if(!string.IsNullOrWhiteSpace(options.Firstname)) {
                 customer.Firstname = options.Firstname;
             }            
             
-            if(string.IsNullOrWhiteSpace(options.Lastname)) {
+            if(!string.IsNullOrWhiteSpace(options.Lastname)) {
                 customer.Lastname = options.Lastname;
             }
 
-            if(options.Phone != null) {
+            if(!string.IsNullOrWhiteSpace(options.Phone)) {
                 customer.Phone = options.Phone;
             }
 
-            return true;
+            context.Update(customer);
+
+            var success = false;
+
+            try {
+                success = context.SaveChanges() > 0;
+            } catch (Exception e) {
+                //
+            }
+
+            return success;
         }
 
         public Customer GetCustomerById(int customerId)
@@ -90,38 +116,55 @@ namespace TinyCrm.Core.Services
                 return default;
             }
 
-            return CustomerList
-                .Where(s => s.Id == customerId)
-                .SingleOrDefault();
+            return SearchCustomer(
+                new SearchCustomerOptions() { 
+                    Id = customerId
+                }
+            ).SingleOrDefault();
         }
 
         public List<Customer> SearchCustomer(SearchCustomerOptions options)
         {
+            
             if(options == null) {
                 return default;
             }
 
-            var customer = CustomerList
-                .Where(s => s.Status == 1);
+            var customerList = context.Set<Customer>()
+                .Where(s => s.Status == 1)
+                .ToList();
 
-            if(!string.IsNullOrWhiteSpace(options.Email)
-                && customer.ToList().Count != 0) {
-                customer = customer.Where(s => s.Email.Contains(options.Email));
+            if(options.Id != 0) {
+                return customerList
+                    .Where(s => s.Id == options.Id)
+                    .ToList();
             }
 
-            if(!string.IsNullOrWhiteSpace(options.VatNumber)
-                && customer.ToList().Count != 0) {
-                customer = customer.Where(s => s.VatNumber.Contains(options.VatNumber));
+            if(!string.IsNullOrWhiteSpace(options.Email)) {
+                customerList = customerList
+                    .Where(s => s.Email.Contains(options.Email))
+                    .ToList();
             }
 
-            if (options.Created != null 
-                && customer.ToList().Count != 0) {
-                customer = customer.Where(s => s.Created < options.Created);
+            if(!string.IsNullOrWhiteSpace(options.VatNumber)) {
+                customerList = customerList
+                    .Where(s => s.VatNumber.Contains(options.VatNumber))
+                    .ToList();
             }
 
-            var filteredList = customer.ToList();
+            if (options.CreatedFrom != null) {
+                customerList = customerList
+                    .Where(s => s.Created > options.CreatedFrom)
+                    .ToList();
+            }            
+            
+            if (options.CreatedTo != null) {
+                customerList = customerList
+                    .Where(s => s.Created < options.CreatedTo)
+                    .ToList();
+            }
 
-            return filteredList;
+            return customerList;
         }
     }
 }

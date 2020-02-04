@@ -7,6 +7,11 @@ namespace TinyCrm.Core.Model.Options
         /// <summary>
         /// 
         /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string Email { get; set; }
 
         /// <summary>
@@ -16,8 +21,14 @@ namespace TinyCrm.Core.Model.Options
 
         /// <summary>
         /// 
+        /// 
         /// </summary>
-        public DateTime? Created { get; set; }
+        public DateTimeOffset CreatedFrom { get; set; }
 
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        public DateTimeOffset CreatedTo { get; set; }
     }
 }

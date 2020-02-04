@@ -18,12 +18,16 @@ namespace TinyCrm.Core.Data
 
             modelBuilder
                 .Entity<Product>()
-                .ToTable("Product");
+                .ToTable("Product");            
+            
+            modelBuilder
+                .Entity<Customer>()
+                .ToTable("Customer");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnConfiguring(optionsBuilder);
+            //base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseSqlServer(connectionString_);
         }
     }

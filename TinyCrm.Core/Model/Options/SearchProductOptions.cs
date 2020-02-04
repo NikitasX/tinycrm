@@ -1,7 +1,13 @@
 ﻿namespace TinyCrm.Core.Model.Options
 {
-    public class UpdateProductOptions
+    public class SearchProductOptions
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Id { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -10,12 +16,22 @@
         /// <summary>
         /// 
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal MaxPrice { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public decimal Discount { get; set; }
+        public decimal MinPrice { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public decimal MaxDiscount { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public decimal MinDiscount { get; set; }
 
         /// <summary>
         /// 
