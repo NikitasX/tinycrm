@@ -34,7 +34,7 @@ namespace TinyCrm.Core.Services
                 Id = options.Id,
                 VatNumber = options.VatNumber,
                 Email = options.Email,
-                DateCreated = DateTime.UtcNow,
+                Created = DateTime.UtcNow,
                 Status = options.Status
             };
 
@@ -114,9 +114,9 @@ namespace TinyCrm.Core.Services
                 customer = customer.Where(s => s.VatNumber.Contains(options.VatNumber));
             }
 
-            if (options.DateCreated != null 
+            if (options.Created != null 
                 && customer.ToList().Count != 0) {
-                customer = customer.Where(s => s.DateCreated < options.DateCreated);
+                customer = customer.Where(s => s.Created < options.Created);
             }
 
             var filteredList = customer.ToList();

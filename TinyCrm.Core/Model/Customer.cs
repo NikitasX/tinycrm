@@ -42,6 +42,6 @@ namespace TinyCrm.Core.Model
         /// <summary>
         /// 
         /// </summary>
-        public DateTime DateCreated { get; set; }
+        public DateTimeOffset Created { get; set; }
     }
 }

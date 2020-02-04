@@ -5,6 +5,12 @@ namespace TinyCrm.Core.Data
 {
     public class TinyCrmDbContext : DbContext
     {
+        private readonly string connectionString_;
+
+        public TinyCrmDbContext() : base()
+        {
+            connectionString_ = "Server=localhost;Database=tinycrm;User id=sa;Password=QWE123!@#";
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,7 +24,7 @@ namespace TinyCrm.Core.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Server=localhost;Database=tinycrm;Integrated Security=True;");
+            optionsBuilder.UseSqlServer(connectionString_);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace TinyCrm.Core.Model.Options
         /// <summary>
         /// 
         /// </summary>
-        public DateTime DateCreated { get; set; }
+        public DateTime Created { get; set; }
 
         /// <summary>
         /// 
