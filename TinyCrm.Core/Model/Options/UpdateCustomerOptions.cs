@@ -30,6 +30,6 @@
         /// <summary>
         /// 
         /// </summary>
-        public int? Status { get; set; }
+        public bool? Status { get; set; }
     }
 }

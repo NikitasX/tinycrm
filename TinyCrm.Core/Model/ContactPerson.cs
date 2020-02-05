@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace TinyCrm.Core.Model
 {
-    public class Order
+    public class ContactPerson
     {
         /// <summary>
         /// 
@@ -12,31 +14,31 @@ namespace TinyCrm.Core.Model
         /// <summary>
         /// 
         /// </summary>
-        public string DeliveryAdress { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public decimal Amount { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public Customer Customer { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public OrderStatus Status { get; set; }
+        public string Firstname { get; set; }        
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Lastname { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        // public int CustomerId { get; set; }
+        public string Email { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        //public List<Product> Products;
+        public string Phone { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ContactPersonPositions Position { get; set; }
     }
 }

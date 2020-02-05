@@ -22,17 +22,17 @@ namespace TinyCrm.Core.Services
         {
         }
 
-        public bool CreateCustomer(CreateCustomerOptions options)
+        public Customer CreateCustomer(CreateCustomerOptions options)
         {
 
             if(options == null) {
-                return false;
+                return default;
             }
 
             if(string.IsNullOrWhiteSpace(options.Email) ||
                 string.IsNullOrWhiteSpace(options.VatNumber) ||
                 string.IsNullOrWhiteSpace(options.Lastname)) {
-                return false;
+                return default;
             }
 
             var customer = new Customer()
@@ -43,7 +43,7 @@ namespace TinyCrm.Core.Services
                 Firstname = options.Firstname,
                 Lastname = options.Lastname,
                 Created = DateTime.UtcNow,
-                Status = 1
+                Status = true
             };
 
             context.Add(customer);
@@ -53,10 +53,14 @@ namespace TinyCrm.Core.Services
             try {
                 success = context.SaveChanges() > 0;
             } catch (Exception e) {
-                //
+                // Log
             }
 
-            return success;
+            if(success == true) {
+                return customer;
+            } else {
+                return default;
+            }
         }
 
         public bool UpdateCustomer(int customerId, UpdateCustomerOptions options)
@@ -131,7 +135,7 @@ namespace TinyCrm.Core.Services
             }
 
             var customerList = context.Set<Customer>()
-                .Where(s => s.Status == 1)
+                .Where(s => s.Status == true)
                 .ToList();
 
             if(options.Id != 0) {

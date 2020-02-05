@@ -24,7 +24,7 @@ namespace TinyCrm.Core.Services
             var customer = customerCheck.GetCustomerById(customerId);
 
             if(customer == null ||
-                customer.Status == 0) {
+                customer.Status == false) {
                 throw new ApplicationException(
                     $"Customer not found or Inactive");
             }
@@ -57,10 +57,10 @@ namespace TinyCrm.Core.Services
             var order = new Order()
             {
                 Id = AIID,
-                CustomerId = customerId,
+                //CustomerId = customerId,
                 Amount = amount,
                 Status = OrderStatus.Pending,
-                Products = productList
+                //Products = productList
             };
 
             AIID++;
@@ -103,7 +103,7 @@ namespace TinyCrm.Core.Services
                     amount += p.Price;
                 }
 
-                order.Products = options.Products;
+                //order.Products = options.Products;
                 order.Amount = amount;
             }
 

@@ -4,9 +4,9 @@ using TinyCrm.Core.Model.Options;
 
 namespace TinyCrm.Core.Services
 {
-    interface ICustomerService
+    public interface ICustomerService
     {
-        bool CreateCustomer(CreateCustomerOptions options);
+        Customer CreateCustomer(CreateCustomerOptions options);
 
         bool UpdateCustomer(int customerId, UpdateCustomerOptions options);
 

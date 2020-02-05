@@ -22,7 +22,15 @@ namespace TinyCrm.Core.Data
             
             modelBuilder
                 .Entity<Customer>()
-                .ToTable("Customer");
+                .ToTable("Customer");            
+            
+            modelBuilder
+                .Entity<Order>()
+                .ToTable("Order");            
+            
+            modelBuilder
+                .Entity<ContactPerson>()
+                .ToTable("ContactPerson");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -4,7 +4,7 @@ using TinyCrm.Core.Model.Options;
 
 namespace TinyCrm.Core.Services
 {
-    interface IOrderService
+    public interface IOrderService
     {
         Order CreateOrder(int customerId, List<Product> productList);
 
