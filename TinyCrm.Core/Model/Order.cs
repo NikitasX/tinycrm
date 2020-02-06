@@ -32,11 +32,11 @@ namespace TinyCrm.Core.Model
         /// <summary>
         /// 
         /// </summary>
-        // public int CustomerId { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        //public List<Product> Products;
+        public ICollection<OrderProduct> Products { get; set; }
+        
+        public Order()
+        {
+            Products = new List<OrderProduct>();
+        }
     }
 }

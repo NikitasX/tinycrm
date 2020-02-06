@@ -10,116 +10,54 @@ using Xunit;
 
 namespace TinyCrm.Tests
 {
-    public partial class CustomerServiceTests
+    public partial class CustomerServiceTests : IDisposable
     {
         private readonly Core.Services.ICustomerService csvc_;
+        private readonly TinyCrmDbContext context;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CustomerServiceTests()
         {
-            csvc_ = new Core.Services.CustomerService(
-                new TinyCrmDbContext());
-        }
-
-        [Fact]
-        public int Add_Customer_Contacts ()
-        {
-            using (var context = new TinyCrmDbContext()) {
-
-                var customer = new Customer()
-                {
-                    VatNumber = "117003949",
-                    Email = "dpnevmatikos@codehub.gr",
-                    Status = true
-                };
-
-                customer.ContactPeople.Add(new ContactPerson {
-                    Lastname = "Kopsidis",
-                    Email = "kopsidis@kopsidis.gr",
-                    Firstname = "Giwrgos",
-                    Phone = "+306988423433",
-                    Position = ContactPersonPositions.Developer
-                });
-
-                context.Add(customer);
-                context.SaveChanges();
-
-                return customer.Id;
-            }
-        }
-
-        [Fact]
-        public void Retrieve_Contacts()
-        {
-            var customerId = Add_Customer_Contacts();
-            using (var context = new TinyCrmDbContext()) {
-                var contactPeople = context
-                    .Set<ContactPerson>()
-                    .Where(c => c.Customer.Id == customerId)
-                    .ToList();
-            }
-        }
-
-        [Fact]
-        public void Customer_Order_Success()
-        {
-            using (var context = new TinyCrmDbContext()) {
-                var customer = new Customer() { 
-                    VatNumber = "117003949",
-                    Email = "dpnevmatikos@codehub.gr",
-                    Status = true
-                };
-
-                customer.Orders.Add(
-                    new Order()
-                    {
-                        DeliveryAdress = "Kleeman Kilkis",
-                        Amount = 999,
-                        Status = OrderStatus.Pending
-                    });
-                context.Add(customer);
-                context.SaveChanges();
-            }
-        }
-
-        [Fact]
-        public void Orders_Retrieve()
-        {
-            using (var context = new TinyCrmDbContext()) {
-                var orders = context.Set<Order>()
-                    .Include(o => o.Customer)
-                    .ToList();
-            };
-        }
-
-        [Fact]
-        public void Customer_Order_Retrieve()
-        {
-            using (var context = new TinyCrmDbContext()) {
-                var customer = context
-                    .Set<Customer>()
-                    .Include(c => c.Orders)
-                    .Where(c => c.VatNumber == "117003949")
-                    .FirstOrDefault();
-
-                Assert.NotNull(customer);
-            }
+            context = new TinyCrmDbContext();
+            csvc_ = new Core.Services.CustomerService(context);
         }
 
         [Fact]
         public void CreateCustomer_Success()
         {
-            var customerOptions = new CreateCustomerOptions()
-            {
-                Email = "papaki@papaki.gr",
-                Firstname = "Lakis",
-                Lastname = "Papakis",
-                Phone = "+3928282828",
-                VatNumber = "832832272"
-            };
+            var customer = csvc_.CreateCustomer(
+                new CreateCustomerOptions() { 
+                    VatNumber = $"999{DateTime.UtcNow.Millisecond:D6}",
+                    Email = "testcustomer@iamtesting.com",
+                    Firstname = "Jon",
+                    Lastname = "Doe",
+                    Phone = "+30699999999"
+                });
+            Assert.NotNull(customer);
 
-            Assert.NotNull(csvc_.CreateCustomer(customerOptions));
+            var databaseCustomer = csvc_.SearchCustomer(new SearchCustomerOptions()
+                {
+                    VatNumber = customer.VatNumber
+                }).SingleOrDefault();
 
-            ///Continue Create customer success
+            Assert.NotNull(databaseCustomer);
+
+            Assert.Equal(customer.Email, databaseCustomer.Email);
+            Assert.Equal(customer.Firstname, databaseCustomer.Firstname);
+            Assert.Equal(customer.Lastname, databaseCustomer.Lastname);
+            Assert.Equal(customer.Phone, databaseCustomer.Phone);
+            Assert.True(databaseCustomer.Status);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            context.Dispose();
+        }
+
     }
 }

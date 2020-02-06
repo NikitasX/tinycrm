@@ -6,7 +6,7 @@ namespace TinyCrm.Core.Services
 {
     public interface IOrderService
     {
-        Order CreateOrder(int customerId, List<Product> productList);
+        Order CreateOrder(int customerId, ICollection<string> productIds);
 
         string UpdateOrder(int orderId, UpdateOrderOptions options);
 

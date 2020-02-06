@@ -62,6 +62,7 @@ namespace TinyCrm.Core.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Firstname")
@@ -74,12 +75,18 @@ namespace TinyCrm.Core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("Status")
+                        .IsRequired()
                         .HasColumnType("bit");
 
                     b.Property<string>("VatNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(9)")
+                        .HasMaxLength(9);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("VatNumber")
+                        .IsUnique();
 
                     b.ToTable("Customer");
                 });
@@ -110,6 +117,21 @@ namespace TinyCrm.Core.Migrations
                     b.ToTable("Order");
                 });
 
+            modelBuilder.Entity("TinyCrm.Core.Model.OrderProduct", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("OrderId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProduct");
+                });
+
             modelBuilder.Entity("TinyCrm.Core.Model.Product", b =>
                 {
                     b.Property<string>("Id")
@@ -125,6 +147,7 @@ namespace TinyCrm.Core.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
@@ -147,6 +170,21 @@ namespace TinyCrm.Core.Migrations
                     b.HasOne("TinyCrm.Core.Model.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId");
+                });
+
+            modelBuilder.Entity("TinyCrm.Core.Model.OrderProduct", b =>
+                {
+                    b.HasOne("TinyCrm.Core.Model.Order", "Order")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TinyCrm.Core.Model.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

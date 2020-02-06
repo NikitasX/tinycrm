@@ -9,19 +9,33 @@ namespace TinyCrm.Core.Services
 {
     public class CustomerService : ICustomerService
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly TinyCrmDbContext context;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
         public CustomerService(TinyCrmDbContext ctx)
         {
             context = ctx
                 ?? throw new ArgumentNullException(nameof(ctx));
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public CustomerService()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public Customer CreateCustomer(CreateCustomerOptions options)
         {
 
@@ -31,7 +45,17 @@ namespace TinyCrm.Core.Services
 
             if(string.IsNullOrWhiteSpace(options.Email) ||
                 string.IsNullOrWhiteSpace(options.VatNumber) ||
-                string.IsNullOrWhiteSpace(options.Lastname)) {
+                options.VatNumber.Length != 9) {
+                return default;
+            }
+
+            var exists = SearchCustomer(
+                new SearchCustomerOptions()
+                {
+                    VatNumber = options.VatNumber
+                }).Any();
+
+            if(exists) {
                 return default;
             }
 
@@ -63,6 +87,12 @@ namespace TinyCrm.Core.Services
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public bool UpdateCustomer(int customerId, UpdateCustomerOptions options)
         {
             if (options == null ||
@@ -113,62 +143,69 @@ namespace TinyCrm.Core.Services
             return success;
         }
 
-        public Customer GetCustomerById(int customerId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public Customer GetCustomerById(int? customerId)
         {
 
-            if (customerId < 0) {
+            if (customerId != null) {
                 return default;
             }
 
             return SearchCustomer(
-                new SearchCustomerOptions() { 
+                new SearchCustomerOptions()
+                {
                     Id = customerId
-                }
-            ).SingleOrDefault();
+                }).SingleOrDefault();
         }
 
-        public List<Customer> SearchCustomer(SearchCustomerOptions options)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public IQueryable<Customer> SearchCustomer(SearchCustomerOptions options)
         {
             
             if(options == null) {
                 return default;
             }
 
-            var customerList = context.Set<Customer>()
-                .Where(s => s.Status == true)
-                .ToList();
+            var query = context
+                .Set<Customer>()
+                .AsQueryable();
 
-            if(options.Id != 0) {
-                return customerList
-                    .Where(s => s.Id == options.Id)
-                    .ToList();
+            if (options.Id != null) {
+                return query
+                    .Where(s => s.Id == options.Id);
             }
 
-            if(!string.IsNullOrWhiteSpace(options.Email)) {
-                customerList = customerList
-                    .Where(s => s.Email.Contains(options.Email))
-                    .ToList();
+            if (!string.IsNullOrWhiteSpace(options.VatNumber)) {
+                query = query
+                    .Where(s => s.VatNumber == options.VatNumber);
             }
 
-            if(!string.IsNullOrWhiteSpace(options.VatNumber)) {
-                customerList = customerList
-                    .Where(s => s.VatNumber.Contains(options.VatNumber))
-                    .ToList();
+            if (!string.IsNullOrWhiteSpace(options.Email)) {
+                query = query
+                    .Where(s => s.Email == options.Email);
             }
 
+            
             if (options.CreatedFrom != null) {
-                customerList = customerList
-                    .Where(s => s.Created > options.CreatedFrom)
-                    .ToList();
+                query = query
+                    .Where(s => s.Created > options.CreatedFrom);
             }            
             
             if (options.CreatedTo != null) {
-                customerList = customerList
-                    .Where(s => s.Created < options.CreatedTo)
-                    .ToList();
+                query = query
+                    .Where(s => s.Created < options.CreatedTo);
             }
-
-            return customerList;
+            
+            return query
+                .Take(500);
         }
     }
 }

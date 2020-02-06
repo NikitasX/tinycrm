@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 
@@ -8,121 +9,88 @@ namespace TinyCrm.Core.Services
 {
     public class OrderService : IOrderService
     {
+        private readonly ICustomerService customers_;
+        private readonly TinyCrmDbContext context_;
 
-        private static List<Order> OrderList = new List<Order>();
-
-        private int AIID = 0;
-
-        public Order CreateOrder(int customerId, List<Product> productList)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="customers"></param>
+        /// <param name="context"></param>
+        public OrderService(
+            ICustomerService customers,
+            TinyCrmDbContext context)
         {
-            if(customerId < 0) {
-                throw new ArgumentOutOfRangeException(
-                    $"The value of {nameof(customerId)} cannot be smaller than 0");
-            }
+            context_ = context;
+            customers_ = customers;
+        }
 
-            var customerCheck = new CustomerService();
-            var customer = customerCheck.GetCustomerById(customerId);
-
-            if(customer == null ||
-                customer.Status == false) {
-                throw new ApplicationException(
-                    $"Customer not found or Inactive");
-            }
-
-            if(productList.Count == 0) {
-                throw new ArgumentNullException(
-                    $"{nameof(productList)} cannot be empty");
-            }
-
-            var pService = new ProductService();
-            var i = 0;
-
-            decimal amount = 0;
+        public Order CreateOrder(int customerId, ICollection<string> productIds)
+        {
+            if(customerId <= 0) {
+                return null;
+            }            
             
-            foreach(var p in productList.ToList()) {
-                if(pService.GetProductById(p.Id) == default) {
-                    productList.RemoveAt(i);
-                } else {
-                    amount += p.Price;
-                }
-                i++;
+            if(productIds == null ||
+                productIds.Count == 0) {
+                return null;
             }
 
-            if(productList.Count == 0) {
-                throw new ArgumentNullException(
-                    $"Products submitted in {nameof(productList)} " +
-                    $"not found in Products database");
+            productIds = productIds
+                .Distinct()
+                .ToList();
+
+            var customer = customers_.SearchCustomer(
+                new SearchCustomerOptions() { 
+                    Id = customerId
+                })
+                .Where(c => c.Status == true)
+                .SingleOrDefault();
+
+            if(customer == null) {
+                return null;
+            }
+
+            var products = context_
+                .Set<Product>()
+                .Where(p => productIds.Contains(p.Id))
+                .Distinct()
+                .ToList();
+
+            if (products.Count != productIds.Count) {
+                return null;
             }
 
             var order = new Order()
             {
-                Id = AIID,
-                //CustomerId = customerId,
-                Amount = amount,
-                Status = OrderStatus.Pending,
-                //Products = productList
+                Customer = customer
             };
 
-            AIID++;
-
-            OrderList.Add(order);
+            foreach(var p in products) {
+                order.Products.Add(
+                    new OrderProduct()
+                    {
+                        ProductId = p.Id
+                    });
+            }
+            context_.Add(order);
+            try {
+                context_.SaveChanges();
+            } catch (Exception) {
+                return null;
+            }
 
             return order;
         }
 
-        public string UpdateOrder(int orderId, UpdateOrderOptions options)
-        {
-            if(orderId < 0) {
-                return $"Invalid {nameof(orderId)}, smaller than 0";
-            }
-
-            if(options == null) {
-                return $"Invalid {nameof(options)}, empty";
-            }
-
-            var order = GetOrderById(orderId);
-
-            if(order == null) {
-                return "Order not found by id";
-            }
-
-            if(options.Status.Equals(OrderStatus.Canceled)) {
-                order.Status = OrderStatus.Canceled;
-                return "Order cancelled succesfully";
-            }
-
-            if(!string.IsNullOrWhiteSpace(options.DeliveryAdress)) {
-                order.DeliveryAdress = options.DeliveryAdress;
-            }
-
-            if (options.Products != null &&
-                options.Products.Count != 0) {
-                decimal amount = 0;
-                
-                foreach(var p in options.Products) {
-                    amount += p.Price;
-                }
-
-                //order.Products = options.Products;
-                order.Amount = amount;
-            }
-
-            if(!options.Status.Equals(OrderStatus.Invalid)) {
-                order.Status = options.Status;
-            }
-
-            return "Order Updated Successfully";
-        }
-
         public Order GetOrderById(int orderId)
         {
-            if (orderId < 0) {
-                return default;
-            }
+            throw new NotImplementedException();
+        }
 
-            return OrderList
-                .Where(s => s.Id.Equals(orderId))
-                .SingleOrDefault();
+        public string UpdateOrder(int orderId, UpdateOrderOptions options)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 
@@ -10,8 +11,8 @@ namespace TinyCrm.Core.Services
 
         bool UpdateCustomer(int customerId, UpdateCustomerOptions options);
 
-        List<Customer> SearchCustomer(SearchCustomerOptions options);
+        IQueryable<Customer> SearchCustomer(SearchCustomerOptions options);
 
-        Customer GetCustomerById(int customerId);
+        Customer GetCustomerById(int? customerId);
     }
 }

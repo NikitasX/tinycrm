@@ -12,18 +12,31 @@ namespace TinyCrm.Core.Services
     {
         // Assign the random class to a `Utility` property.
         public static Random GenerateRandomNumber = new Random();
+
         private readonly TinyCrmDbContext context;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
         public ProductService(TinyCrmDbContext ctx) 
         {
             context = ctx 
                 ?? throw new ArgumentNullException(nameof(ctx));
         }        
         
+        /// <summary>
+        /// 
+        /// </summary>
         public ProductService() 
         {
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public bool AddProduct(AddProductOptions options)
         {
             if (options == null) {
@@ -75,6 +88,12 @@ namespace TinyCrm.Core.Services
             return success;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public bool UpdateProduct(string productId, 
             UpdateProductOptions options)
         {
@@ -126,6 +145,11 @@ namespace TinyCrm.Core.Services
             return success;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         public List<Product> SearchProduct(SearchProductOptions options)
         {
             if (options == null) {
@@ -188,6 +212,11 @@ namespace TinyCrm.Core.Services
             return productList;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productId"></param>
+        /// <returns></returns>
         public Product GetProductById(string productId)
         {
             if(string.IsNullOrWhiteSpace(productId)) {
@@ -201,7 +230,11 @@ namespace TinyCrm.Core.Services
             ).SingleOrDefault();
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="csvURL"></param>
+        /// <returns></returns>
         public Dictionary<string, string> ParseCSV(string csvURL)
         {
 
