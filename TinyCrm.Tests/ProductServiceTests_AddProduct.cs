@@ -1,4 +1,5 @@
 using System;
+using TinyCrm.Core.Model;
 using Xunit;
 
 namespace TinyCrm.Tests
@@ -57,13 +58,15 @@ namespace TinyCrm.Tests
 
                 var attributeArray = p.Value.Split('|');
 
-                Assert.True(psvc_.AddProduct(new Core.Model.Options.AddProductOptions()
+                context.Add(new Product()
                 {
-                    Id = p.Key.ToString(),
+                    Id = $"{p.Key.ToString()}",
                     Name = attributeArray[0],
                     Price = decimal.Parse(attributeArray[1]),
                     Category = Core.Model.ProductCategory.Laptops
-                }));
+                });
+
+                context.SaveChanges();
             }
         }
 
