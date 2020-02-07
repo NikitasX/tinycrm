@@ -1,6 +1,6 @@
+using Xunit;
 using System;
 using TinyCrm.Core.Model;
-using Xunit;
 
 namespace TinyCrm.Tests
 {

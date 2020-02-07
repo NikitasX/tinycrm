@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Xunit;
 using TinyCrm.Core.Model.Options;
-using Xunit;
 
 namespace TinyCrm.Tests
 {

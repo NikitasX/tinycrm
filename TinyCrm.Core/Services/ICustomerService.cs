@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 

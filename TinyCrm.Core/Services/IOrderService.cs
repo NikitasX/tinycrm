@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using TinyCrm.Core.Model;
+﻿using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
+using System.Collections.Generic;
 
 namespace TinyCrm.Core.Services
 {
