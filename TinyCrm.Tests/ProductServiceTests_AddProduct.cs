@@ -58,7 +58,7 @@ namespace TinyCrm.Tests
 
                 var attributeArray = p.Value.Split('|');
 
-                context.Add(new Product()
+                context_.Add(new Product()
                 {
                     Id = $"{p.Key.ToString()}",
                     Name = attributeArray[0],
@@ -66,13 +66,13 @@ namespace TinyCrm.Tests
                     Category = Core.Model.ProductCategory.Laptops
                 });
 
-                context.SaveChanges();
+                context_.SaveChanges();
             }
         }
 
         public void Dispose()
         {
-            context.Dispose();
+            context_.Dispose();
         }
     }
 }

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Xunit;
+using Autofac;
 using System.Linq;
-using System.Text;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Services;
-using Xunit;
+using System.Collections.Generic;
 
 namespace TinyCrm.Tests
 {
-    public class OrderServiceTests : IDisposable
+    public class OrderServiceTests : IClassFixture<TinyCrmFixture>
     {
         private readonly IOrderService orders_;
         private readonly IProductService products_;
@@ -17,12 +16,12 @@ namespace TinyCrm.Tests
         private readonly TinyCrmDbContext context_;
 
 
-        public OrderServiceTests()
+        public OrderServiceTests(TinyCrmFixture fixture)
         {
-            context_ = new TinyCrmDbContext();
-            products_ = new ProductService(context_);
-            customers_ = new CustomerService(context_);
-            orders_ = new OrderService(customers_, context_);
+            context_ = fixture.DbContext;
+            products_ = fixture.Container.Resolve<IProductService>();
+            customers_ = fixture.Container.Resolve<ICustomerService>();
+            orders_ = fixture.Container.Resolve<IOrderService>();
         }
 
         [Fact]
@@ -46,11 +45,6 @@ namespace TinyCrm.Tests
             Assert.True(context_
                 .Set<OrderProduct>()
                 .All(op => productIds.Contains(op.ProductId)));
-        }
-
-        public void Dispose()
-        {
-            context_.Dispose();
         }
     }
 }

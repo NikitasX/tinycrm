@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Xunit;
+using System;
 using System.Linq;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
 using TinyCrm.Core.Data;
-using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
-using Xunit;
 
 namespace TinyCrm.Tests
 {
-    public partial class CustomerServiceTests : IDisposable
+    public partial class CustomerServiceTests : IClassFixture<TinyCrmFixture>
     {
         private readonly Core.Services.ICustomerService csvc_;
-        private readonly TinyCrmDbContext context;
+        private readonly TinyCrmDbContext context_;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public CustomerServiceTests()
+        public CustomerServiceTests(TinyCrmFixture fixture)
         {
-            context = new TinyCrmDbContext();
-            csvc_ = new Core.Services.CustomerService(context);
+            context_ = fixture.DbContext;
+            csvc_ = new Core.Services.CustomerService(context_);
         }
 
         [Fact]
@@ -50,14 +46,5 @@ namespace TinyCrm.Tests
             Assert.Equal(customer.Phone, databaseCustomer.Phone);
             Assert.True(databaseCustomer.Status);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            context.Dispose();
-        }
-
     }
 }
