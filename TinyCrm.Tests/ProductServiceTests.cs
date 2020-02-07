@@ -1,5 +1,6 @@
 using Xunit;
-using TinyCrm.Core.Data;
+using Autofac;
+using TinyCrm.Core.Services;
 
 namespace TinyCrm.Tests
 {
@@ -11,7 +12,7 @@ namespace TinyCrm.Tests
         public ProductServiceTests (TinyCrmFixture fixture)
         {
             context_ = fixture.DbContext;
-            psvc_ = new Core.Services.ProductService(context_);
+            psvc_ = fixture.Container.Resolve<IProductService>();
         }
 
         [Fact]

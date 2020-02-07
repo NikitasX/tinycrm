@@ -1,8 +1,10 @@
 ﻿using Xunit;
 using System;
+using Autofac;
 using System.Linq;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model.Options;
+using TinyCrm.Core.Services;
 
 namespace TinyCrm.Tests
 {
@@ -17,7 +19,7 @@ namespace TinyCrm.Tests
         public CustomerServiceTests(TinyCrmFixture fixture)
         {
             context_ = fixture.DbContext;
-            csvc_ = new Core.Services.CustomerService(context_);
+            csvc_ = fixture.Container.Resolve<ICustomerService>();
         }
 
         [Fact]
