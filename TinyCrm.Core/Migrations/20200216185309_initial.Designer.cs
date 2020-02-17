@@ -10,7 +10,7 @@ using TinyCrm.Core.Data;
 namespace TinyCrm.Core.Migrations
 {
     [DbContext(typeof(TinyCrmDbContext))]
-    [Migration("20200206090756_initial")]
+    [Migration("20200216185309_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,12 +53,31 @@ namespace TinyCrm.Core.Migrations
                     b.ToTable("ContactPerson");
                 });
 
+            modelBuilder.Entity("TinyCrm.Core.Model.Country", b =>
+                {
+                    b.Property<string>("CountryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CountryFullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CountryId");
+
+                    b.HasIndex("CountryId")
+                        .IsUnique();
+
+                    b.ToTable("Country");
+                });
+
             modelBuilder.Entity("TinyCrm.Core.Model.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CountryId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset");
@@ -86,6 +105,8 @@ namespace TinyCrm.Core.Migrations
                         .HasMaxLength(9);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("VatNumber")
                         .IsUnique();
@@ -165,6 +186,13 @@ namespace TinyCrm.Core.Migrations
                     b.HasOne("TinyCrm.Core.Model.Customer", "Customer")
                         .WithMany("ContactPeople")
                         .HasForeignKey("CustomerId");
+                });
+
+            modelBuilder.Entity("TinyCrm.Core.Model.Customer", b =>
+                {
+                    b.HasOne("TinyCrm.Core.Model.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId");
                 });
 
             modelBuilder.Entity("TinyCrm.Core.Model.Order", b =>

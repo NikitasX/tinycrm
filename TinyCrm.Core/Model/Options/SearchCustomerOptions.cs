@@ -21,6 +21,11 @@ namespace TinyCrm.Core.Model.Options
 
         /// <summary>
         /// 
+        /// </summary>
+        public Country Country { get; set; }
+
+        /// <summary>
+        /// 
         /// 
         /// </summary>
         public DateTimeOffset? CreatedFrom { get; set; }

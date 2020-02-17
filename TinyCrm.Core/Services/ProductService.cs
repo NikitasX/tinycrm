@@ -5,6 +5,8 @@ using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using System.Collections.Generic;
 using TinyCrm.Core.Model.Options;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace TinyCrm.Core.Services
 {
@@ -37,7 +39,7 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public bool AddProduct(AddProductOptions options)
+        public async Task<bool> AddProduct(AddProductOptions options)
         {
             if (options == null) {
                 return false;
@@ -47,9 +49,9 @@ namespace TinyCrm.Core.Services
                 return false;
             }
 
-            var product = GetProductById(options.Id);
+            var product = await GetProductById(options.Id);
             
-            if (product != null) {
+            if (product.Data != null) {
                 return false;
             }
 
@@ -65,7 +67,7 @@ namespace TinyCrm.Core.Services
                 return false;
             }
 
-            product = new Product()
+            product.Data = new Product()
             {
                 Id = options.Id,
                 Name = options.Name,
@@ -75,12 +77,12 @@ namespace TinyCrm.Core.Services
                 Category = options.Category
             };
 
-            context.Add(product);
+            context.Add(product.Data);
 
             var success = false;
 
             try {
-                success = context.SaveChanges() > 0;
+                success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
                 //
             }
@@ -94,7 +96,7 @@ namespace TinyCrm.Core.Services
         /// <param name="productId"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public bool UpdateProduct(string productId, 
+        public async Task<bool> UpdateProduct(string productId, 
             UpdateProductOptions options)
         {
 
@@ -106,38 +108,38 @@ namespace TinyCrm.Core.Services
                 return false;
             }
 
-            var product = GetProductById(productId);
+            var product = await GetProductById(productId);
 
-            if (product == null) {
+            if (product.Data == null) {
                 return false;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Name)) {
-                product.Name = options.Name;
+                product.Data.Name = options.Name;
             }
 
             if (options.Price > 0) {
-                product.Price = options.Price;
+                product.Data.Price = options.Price;
             }
             
             if(options.Discount > 0) {
-                product.Discount = options.Discount;
+                product.Data.Discount = options.Discount;
             }
 
             if (!string.IsNullOrWhiteSpace(options.Description)) {
-                product.Description = options.Description;
+                product.Data.Description = options.Description;
             }
 
             if(options.Category != ProductCategory.Invalid) {
-                product.Category = options.Category;
+                product.Data.Category = options.Category;
             }
 
-            context.Update(product);
+            context.Update(product.Data);
 
             var success = false;
 
             try {
-                success = context.SaveChanges() > 0;
+                success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
                 //
             }
@@ -157,6 +159,7 @@ namespace TinyCrm.Core.Services
             }
 
             var productList = context.Set<Product>()
+                .Take(100)
                 .ToList();
 
             if (!string.IsNullOrWhiteSpace(options.Id)) {
@@ -217,17 +220,25 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="productId"></param>
         /// <returns></returns>
-        public Product GetProductById(string productId)
+        public async Task<ApiResult<Product>> GetProductById(string productId)
         {
             if(string.IsNullOrWhiteSpace(productId)) {
                 return default;
             }
-            
-            return SearchProduct(
-                new SearchProductOptions() { 
-                    Id = productId
-                }
-            ).SingleOrDefault();
+
+            var product = await context
+                .Set<Product>()
+                .SingleOrDefaultAsync(p => p.Id == productId);
+
+            if(product == null) {
+                return new ApiResult<Product>(StatusCode.NotFound, "Product not found in database");
+            }
+
+            return new ApiResult<Product>()
+            {
+                ErrorCode = StatusCode.Ok,
+                Data = product
+            };
         }
 
         /// <summary>

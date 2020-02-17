@@ -43,6 +43,11 @@ namespace TinyCrm.Core.Model
         /// <summary>
         /// 
         /// </summary>
+        public Country Country { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ICollection<Order> Orders { get; set; }
  
         /// <summary>

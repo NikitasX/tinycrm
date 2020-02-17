@@ -1,0 +1,56 @@
+﻿@model TinyCrm.Web.Models.CreateCustomerViewModel
+
+<form method="post" action="@Url.Action("create", "customer")">
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.Firstname)">Firstname</label>
+        @Html.TextBoxFor(c => c.CreateOptions.Firstname, new { @class = "form-control" })
+    </div>      
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.Lastname)">Lastname</label>
+        @Html.TextBoxFor(c => c.CreateOptions.Lastname, new { @class = "form-control" })
+    </div>        
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.Country)">Country</label>
+
+        <select class="form-control" id="@Html.IdFor(c => c.CreateOptions.Country)" name="@Html.IdFor(c => c.CreateOptions.Country)">
+            @{ 
+                foreach(var country in Model.CountryList) {
+                    <option value="@country.CountryId">@country.CountryFullName</option>
+                }
+            }
+        </select>
+    </div>   
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.VatNumber)">Vat Number</label>
+        @Html.TextBoxFor(c => c.CreateOptions.VatNumber, new { @class = "form-control" })
+        <small id="emailHelp" class="form-text text-muted">
+            Vat number should be 9 digits
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.Email)">Email</label>
+        @Html.TextBoxFor(c => c.CreateOptions.Email, new { @class = "form-control" })
+    </div>    
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.CreateOptions.Phone)">Phone</label>
+        @Html.TextBoxFor(c => c.CreateOptions.Phone, new { @class = "form-control" })
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+    @if (!string.IsNullOrWhiteSpace(Model?.ErrorText)) {
+        <div class="alert alert-danger" role="alert">
+            @Model?.ErrorText
+        </div>
+    }    
+    @if (!string.IsNullOrWhiteSpace(Model?.SuccessText)) {
+        <div class="alert alert-success" role="alert">
+            @Model?.SuccessText
+        </div>
+    }
+</form>

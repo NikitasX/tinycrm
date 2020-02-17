@@ -31,5 +31,11 @@
         /// 
         /// </summary>
         public bool? Status { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Country Country { get; set; }
+
     }
 }

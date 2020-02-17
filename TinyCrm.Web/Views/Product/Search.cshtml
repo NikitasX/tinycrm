@@ -1,0 +1,86 @@
+﻿@model TinyCrm.Web.Models.SearchProductViewModel
+
+@{ 
+    if(Model != null && Model.ProductList.Count != 0) {
+    <div class="text-center">
+        <h4 class="display-4">Customers List</h4>
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <td>
+                        Product Id
+                    </td>
+                    <td>
+                        Product Name
+                    </td>
+                    <td>
+                        Product Price
+                    </td>
+                    <td>
+                        Product Discount
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var product in Model.ProductList) {
+                        <tr>
+                            <td>@product.Id</td>
+                            <td>@product.Name</td>
+                            <td>@product.Price</td>
+                            <td>@product.Discount</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+}
+
+<form method="post" action="@Url.Action("search", "product")">
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Id)">Product Id</label>
+        @Html.TextBoxFor(c => c.SearchOptions.Id, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Name)">Product Name</label>
+        @Html.TextBoxFor(c => c.SearchOptions.Name, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Category)">Category</label>
+        <select class="form-control" id="@Html.IdFor(c => c.SearchOptions.Category)" name="@Html.IdFor(c => c.SearchOptions.Category)">
+            <option value="0"></option>
+            <option value="1">Cameras</option>
+            <option value="2">Laptops</option>
+            <option value="3">Computers</option>
+            <option value="4">Smartphones</option>
+            <option value="5">Televisions</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.MinPrice)">Min Price</label>
+        @Html.TextBoxFor(c => c.SearchOptions.MinPrice, new { @class = "form-control" })
+    </div>    
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.MaxPrice)">Max Price</label>
+        @Html.TextBoxFor(c => c.SearchOptions.MaxPrice, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.MinDiscount)">Min Discount</label>
+        @Html.TextBoxFor(c => c.SearchOptions.MinDiscount, new { @class = "form-control" })
+    </div>    
+    
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.MaxDiscount)">Max Discount</label>
+        @Html.TextBoxFor(c => c.SearchOptions.MaxDiscount, new { @class = "form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

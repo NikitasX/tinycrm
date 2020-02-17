@@ -77,7 +77,24 @@ namespace TinyCrm.Core.Data
                 .Entity<Customer>()
                 .Property(c => c.Status)
                 .IsRequired();
+
+            /// <summary>
+            /// Order Model Builder
+            /// </summary>            
+            modelBuilder
+                .Entity<Country>()
+                .ToTable("Country");            
             
+            modelBuilder
+                .Entity<Country>()
+                .Property(c => c.CountryId)
+                .IsRequired();
+
+            modelBuilder
+                .Entity<Country>()
+                .HasIndex(c => c.CountryId)
+                .IsUnique();
+
             /// <summary>
             /// Order Model Builder
             /// </summary>

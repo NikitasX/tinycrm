@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
@@ -35,17 +37,31 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public Customer CreateCustomer(CreateCustomerOptions options)
+        public async Task<ApiResult<Customer>> CreateCustomer(CreateCustomerOptions options)
         {
 
-            if(options == null) {
-                return default;
+            if (options == null) {
+                return new ApiResult<Customer>(
+                    StatusCode.BadRequest, 
+                    $"Null {options}");
             }
 
-            if(string.IsNullOrWhiteSpace(options.Email) ||
-                string.IsNullOrWhiteSpace(options.VatNumber) ||
-                options.VatNumber.Length != 9) {
-                return default;
+            if(string.IsNullOrWhiteSpace(options.Email)) {
+                return new ApiResult<Customer>(
+                    StatusCode.BadRequest, 
+                    "Null or Whitespace Email");
+            }
+
+            if (string.IsNullOrWhiteSpace(options.VatNumber)) {
+                return new ApiResult<Customer>(
+                    StatusCode.BadRequest, 
+                    "Null or Whitespace VatNumber");
+            }
+
+            if (options.VatNumber.Length != 9) {
+                return new ApiResult<Customer>(
+                    StatusCode.BadRequest, 
+                    "VatNumber is not 9 numbers");
             }
 
             var exists = SearchCustomer(
@@ -55,8 +71,15 @@ namespace TinyCrm.Core.Services
                 }).Any();
 
             if(exists) {
-                return default;
+                return new ApiResult<Customer>(
+                    StatusCode.Conflict, 
+                    "Vat already exists in database");
             }
+
+            var country = await context
+                .Set<Country>()
+                .Where(c => c.CountryId == options.Country.CountryId)
+                .SingleOrDefaultAsync();
 
             var customer = new Customer()
             {
@@ -66,7 +89,8 @@ namespace TinyCrm.Core.Services
                 Firstname = options.Firstname,
                 Lastname = options.Lastname,
                 Created = DateTime.UtcNow,
-                Status = true
+                Status = true,
+                Country = country
             };
 
             context.Add(customer);
@@ -74,15 +98,23 @@ namespace TinyCrm.Core.Services
             var success = false;
 
             try {
-                success = context.SaveChanges() > 0;
+                success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
-                // Log
+                return new ApiResult<Customer>(
+                    StatusCode.InternalServerError, 
+                    "Could not save customer");
             }
 
             if(success == true) {
-                return customer;
+                return new ApiResult<Customer>() {
+                    ErrorCode = StatusCode.Ok,
+                    ErrorText = "Customer added succesfully",
+                    Data = customer
+                };
             } else {
-                return default;
+                return new ApiResult<Customer>(
+                    StatusCode.InternalServerError, 
+                    "Something went wrong");
             }
         }
 
@@ -92,7 +124,7 @@ namespace TinyCrm.Core.Services
         /// <param name="customerId"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public bool UpdateCustomer(int customerId, UpdateCustomerOptions options)
+        public async Task<bool> UpdateCustomer(int customerId, UpdateCustomerOptions options)
         {
             if (options == null ||
                 customerId < 0) {
@@ -127,6 +159,10 @@ namespace TinyCrm.Core.Services
 
             if(!string.IsNullOrWhiteSpace(options.Phone)) {
                 customer.Phone = options.Phone;
+            }            
+            
+            if(options.Country != null) {
+                customer.Country = options.Country;
             }
 
             context.Update(customer);
@@ -134,7 +170,7 @@ namespace TinyCrm.Core.Services
             var success = false;
 
             try {
-                success = context.SaveChanges() > 0;
+                success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
                 //
             }
@@ -192,7 +228,11 @@ namespace TinyCrm.Core.Services
                     .Where(s => s.Email == options.Email);
             }
 
-            
+            if(options.Country != null) {
+                query = query
+                    .Where(s => s.Country == options.Country);
+            }
+
             if (options.CreatedFrom != null) {
                 query = query
                     .Where(s => s.Created > options.CreatedFrom);

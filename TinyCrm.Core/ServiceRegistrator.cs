@@ -1,14 +1,17 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Services;
 
 namespace TinyCrm.Core
 {
-    public class ServiceRegistrator
+    public class ServiceRegistrator : Module
     {
-        public static IContainer GetContainer()
+        public static void RegisterServices(ContainerBuilder builder)
         {
-            var builder = new ContainerBuilder();
+            if(builder == null) {
+                throw new ArgumentNullException(nameof(builder));
+            }
 
             builder
                 .RegisterType<ProductService>()
@@ -29,8 +32,20 @@ namespace TinyCrm.Core
                 .RegisterType<TinyCrmDbContext>()
                 .InstancePerLifetimeScope()
                 .AsSelf();
+        }
+
+        public static IContainer CreateContainer()
+        {
+            var builder = new ContainerBuilder();
+            RegisterServices(builder);
 
             return builder.Build();
         }
+
+        protected override void Load(ContainerBuilder builder)
+        {
+            RegisterServices(builder);
+        }
+
     }
 }

@@ -8,22 +8,15 @@ namespace TinyCrm.Core.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Customer",
+                name: "Country",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Phone = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(nullable: false),
-                    Lastname = table.Column<string>(nullable: true),
-                    VatNumber = table.Column<string>(maxLength: 9, nullable: false),
-                    Firstname = table.Column<string>(nullable: true),
-                    Status = table.Column<bool>(nullable: false),
-                    Created = table.Column<DateTimeOffset>(nullable: false)
+                    CountryId = table.Column<string>(nullable: false),
+                    CountryFullName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.PrimaryKey("PK_Country", x => x.CountryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,6 +33,32 @@ namespace TinyCrm.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Product", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customer",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Phone = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: false),
+                    Lastname = table.Column<string>(nullable: true),
+                    VatNumber = table.Column<string>(maxLength: 9, nullable: false),
+                    Firstname = table.Column<string>(nullable: true),
+                    Status = table.Column<bool>(nullable: false),
+                    CountryId = table.Column<string>(nullable: true),
+                    Created = table.Column<DateTimeOffset>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customer_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -118,6 +137,17 @@ namespace TinyCrm.Core.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Country_CountryId",
+                table: "Country",
+                column: "CountryId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customer_CountryId",
+                table: "Customer",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customer_VatNumber",
                 table: "Customer",
                 column: "VatNumber",
@@ -150,6 +180,9 @@ namespace TinyCrm.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "Country");
         }
     }
 }

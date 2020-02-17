@@ -26,5 +26,10 @@
         /// 
         /// </summary>
         public string Firstname { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Country Country { get; set; }
     }
 }
