@@ -19,7 +19,9 @@ namespace TinyCrm.Tests
                 Category = Core.Model.ProductCategory.Smartphones
             };
 
-            Assert.True(await psvc_.UpdateProduct(productId, updateProductOptions));
+            var temp = await psvc_.UpdateProduct(productId, updateProductOptions);
+
+            Assert.True(temp.Success);
 
             var dProduct = await psvc_.GetProductById(productId);
 

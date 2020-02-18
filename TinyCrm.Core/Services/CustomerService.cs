@@ -76,10 +76,14 @@ namespace TinyCrm.Core.Services
                     "Vat already exists in database");
             }
 
-            var country = await context
-                .Set<Country>()
-                .Where(c => c.CountryId == options.Country.CountryId)
-                .SingleOrDefaultAsync();
+            var country = default(Country);
+
+            if(options.Country != null) {
+                country = await context
+                    .Set<Country>()
+                    .Where(c => c.CountryId == options.Country.CountryId)
+                    .SingleOrDefaultAsync();
+            }
 
             var customer = new Customer()
             {
@@ -102,15 +106,11 @@ namespace TinyCrm.Core.Services
             } catch (Exception e) {
                 return new ApiResult<Customer>(
                     StatusCode.InternalServerError, 
-                    "Could not save customer");
+                    $"Something went wrong {e}");
             }
 
             if(success == true) {
-                return new ApiResult<Customer>() {
-                    ErrorCode = StatusCode.Ok,
-                    ErrorText = "Customer added succesfully",
-                    Data = customer
-                };
+                return ApiResult<Customer>.CreateSuccess(customer);
             } else {
                 return new ApiResult<Customer>(
                     StatusCode.InternalServerError, 
@@ -124,58 +124,65 @@ namespace TinyCrm.Core.Services
         /// <param name="customerId"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateCustomer(int customerId, UpdateCustomerOptions options)
+        public async Task<ApiResult<Customer>> UpdateCustomer(
+            int customerId, UpdateCustomerOptions options)
         {
             if (options == null ||
                 customerId < 0) {
-                return false;
+                return new ApiResult<Customer>(
+                    StatusCode.BadRequest,
+                    $"Null {options} or wrong {customerId}");
             }
 
-            var customer = GetCustomerById(customerId);
+            var customer = await GetCustomerById(customerId);
 
             if(customer == null) {
-                return false;
+                return new ApiResult<Customer>(
+                    StatusCode.NotFound,
+                    $"{customerId} not found in database");
             }
 
             if(!string.IsNullOrWhiteSpace(options.Email)) {
-                customer.Email = options.Email;
+                customer.Data.Email = options.Email;
             }            
 
             if(!string.IsNullOrWhiteSpace(options.VatNumber)) {
-                customer.VatNumber = options.VatNumber;
+                customer.Data.VatNumber = options.VatNumber;
             }
 
             if(options.Status != null) {
-                customer.Status = options.Status;
+                customer.Data.Status = options.Status;
             }
 
             if(!string.IsNullOrWhiteSpace(options.Firstname)) {
-                customer.Firstname = options.Firstname;
+                customer.Data.Firstname = options.Firstname;
             }            
             
             if(!string.IsNullOrWhiteSpace(options.Lastname)) {
-                customer.Lastname = options.Lastname;
+                customer.Data.Lastname = options.Lastname;
             }
 
             if(!string.IsNullOrWhiteSpace(options.Phone)) {
-                customer.Phone = options.Phone;
+                customer.Data.Phone = options.Phone;
             }            
             
             if(options.Country != null) {
-                customer.Country = options.Country;
+                customer.Data.Country = options.Country;
             }
 
-            context.Update(customer);
+            context.Update(customer.Data);
 
             var success = false;
 
             try {
                 success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
-                //
+                return new ApiResult<Customer>(
+                    StatusCode.InternalServerError,
+                    $"Something went wrong {e}");
             }
 
-            return success;
+            return ApiResult<Customer>.CreateSuccess(customer.Data);
         }
 
         /// <summary>
@@ -183,18 +190,22 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="customerId"></param>
         /// <returns></returns>
-        public Customer GetCustomerById(int? customerId)
+        public async Task<ApiResult<Customer>> GetCustomerById(int? customerId)
         {
 
-            if (customerId != null) {
-                return default;
+            if (customerId == null) {
+                return new ApiResult<Customer>(StatusCode.BadRequest, $"Null {customerId}");
             }
 
-            return SearchCustomer(
-                new SearchCustomerOptions()
-                {
-                    Id = customerId
-                }).SingleOrDefault();
+            var customer = await context
+                .Set<Customer>()
+                .SingleOrDefaultAsync(p => p.Id == customerId);
+
+            if (customer == null) {
+                return new ApiResult<Customer>(StatusCode.NotFound, $"Customer not found in database");
+            }
+
+            return ApiResult<Customer>.CreateSuccess(customer);
         }
 
         /// <summary>

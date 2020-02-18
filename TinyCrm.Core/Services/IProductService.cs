@@ -2,16 +2,17 @@
 using TinyCrm.Core.Model.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace TinyCrm.Core.Services
 {
     public interface IProductService
     {
-        Task<bool> AddProduct(AddProductOptions options);
+        Task<ApiResult<Product>> AddProduct(AddProductOptions options);
 
-        Task<bool> UpdateProduct(string productId, UpdateProductOptions options);
+        Task<ApiResult<Product>> UpdateProduct(string productId, UpdateProductOptions options);
 
-        List<Product> SearchProduct(SearchProductOptions options);
+        IQueryable<Product> SearchProduct(SearchProductOptions options);
 
         Task<ApiResult<Product>> GetProductById(string productId);
 

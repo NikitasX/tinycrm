@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using TinyCrm.Core;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
+using TinyCrm.Core.Model.Options;
 using TinyCrm.Core.Services;
+using TinyCrm.Web.Extensions;
 
 namespace TinyCrm.Web.Controllers
 {
@@ -34,12 +36,64 @@ namespace TinyCrm.Web.Controllers
             return View(productList);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> CreateProduct(
+            [FromBody] AddProductOptions options)
+        {
+            var result = await Products_.AddProduct(options);
+
+            return result.AsStatusResult();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        [HttpPut("product/{id}")]
+        public async Task<IActionResult> Put(
+            string id, [FromBody] UpdateProductOptions options)
+        {
+            var result = await Products_.UpdateProduct(id, options);
+
+            return result.AsStatusResult();
+        }        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("product/{id}")]
+        public async Task<IActionResult> Get(
+            string id)
+        {
+            var result = await Products_.GetProductById(id);
+
+            return result.AsStatusResult();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Search()
         {
             return View();
         }        
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Search(Models.SearchProductViewModel model)
         {
@@ -53,17 +107,26 @@ namespace TinyCrm.Web.Controllers
             model.SearchOptions.Category = (ProductCategory)Enum.Parse(
                 typeof(ProductCategory), Request.Form["SearchOptions_Category"].ToString());
 
-            model.ProductList = Products_.SearchProduct(model.SearchOptions);
+            model.ProductList = Products_.SearchProduct(model.SearchOptions).ToList();
 
             return View(model);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create(
             Models.CreateProductViewModel model)
@@ -78,7 +141,7 @@ namespace TinyCrm.Web.Controllers
             var result = await Products_.AddProduct(
                 model?.AddOptions);
 
-            if (result == false) {
+            if (result.Success == false) {
                 model.ErrorText = "Oops. Something went wrong";
 
                 return View(model);

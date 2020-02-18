@@ -22,7 +22,7 @@ namespace TinyCrm.Tests
                 Category = Core.Model.ProductCategory.Televisions
             });
 
-            Assert.True(validate);
+            Assert.True(validate.Success);
 
             var product = await psvc_.GetProductById(productId);
             Assert.NotNull(product.Data);
@@ -47,7 +47,7 @@ namespace TinyCrm.Tests
                 //Category = Core.Model.ProductCategory.Invalid
             });
 
-            Assert.False(validate);
+            Assert.False(validate.Success);
         }
 
         [Fact]

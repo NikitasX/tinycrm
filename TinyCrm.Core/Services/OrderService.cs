@@ -32,11 +32,11 @@ namespace TinyCrm.Core.Services
 
         public async Task<ApiResult<Order>> CreateOrder(int customerId, ICollection<string> productIds)
         {
-            if(customerId <= 0) {
+            if (customerId <= 0) {
                 return new ApiResult<Order>(StatusCode.BadRequest, "Invalid customer Id");
-            }            
-            
-            if(productIds == null ||
+            }
+
+            if (productIds == null ||
                 productIds.Count == 0) {
                 return new ApiResult<Order>(StatusCode.BadRequest, "Invalid or empty product list");
             }
@@ -46,13 +46,14 @@ namespace TinyCrm.Core.Services
                 .ToList();
 
             var customer = customers_.SearchCustomer(
-                new SearchCustomerOptions() { 
+                new SearchCustomerOptions()
+                {
                     Id = customerId
                 })
                 .Where(c => c.Status == true)
                 .SingleOrDefault();
 
-            if(customer == null) {
+            if (customer == null) {
                 return new ApiResult<Order>(StatusCode.NotFound, "Customer not found in database");
             }
 
@@ -71,7 +72,7 @@ namespace TinyCrm.Core.Services
                 Customer = customer
             };
 
-            foreach(var p in products) {
+            foreach (var p in products) {
                 order.Products.Add(
                     new OrderProduct()
                     {
@@ -82,14 +83,10 @@ namespace TinyCrm.Core.Services
             try {
                 context_.SaveChanges();
             } catch (Exception e) {
-                return new ApiResult<Order>(StatusCode.InternalServerError, "Changes not saved");
+                return new ApiResult<Order>(StatusCode.InternalServerError, $"Something went wrong {e}");
             }
 
-            return new ApiResult<Order>() {
-                ErrorCode = StatusCode.Ok,
-                ErrorText = "Order saved succesfully",
-                Data = order
-            };
+            return ApiResult<Order>.CreateSuccess(order);
         }
 
         public async Task<Order> GetOrderById(int orderId)

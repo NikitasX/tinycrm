@@ -9,10 +9,10 @@ namespace TinyCrm.Core.Services
     {
         Task<ApiResult<Customer>> CreateCustomer(CreateCustomerOptions options);
 
-        Task<bool> UpdateCustomer(int customerId, UpdateCustomerOptions options);
+        Task<ApiResult<Customer>> UpdateCustomer(int customerId, UpdateCustomerOptions options);
 
         IQueryable<Customer> SearchCustomer(SearchCustomerOptions options);
 
-        Customer GetCustomerById(int? customerId);
+        Task<ApiResult<Customer>> GetCustomerById(int? customerId);
     }
 }

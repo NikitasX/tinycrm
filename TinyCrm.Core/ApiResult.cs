@@ -1,6 +1,6 @@
 ﻿namespace TinyCrm.Core
 {
-    public class ApiResult<T> where T : class
+    public class ApiResult<T>
     {
         public StatusCode ErrorCode { get; set; }
         
@@ -8,11 +8,32 @@
 
         public T Data { get; set; }
 
-        public ApiResult()
-        {
+        public bool Success => ErrorCode == StatusCode.Ok;
 
-        }        
-        
+
+        public ApiResult()
+        { }
+
+        public static ApiResult<T> CreateSuccess(T data)
+        {
+            return new ApiResult<T>()
+            {
+                ErrorCode = StatusCode.Ok,
+                Data = data
+            };
+        }
+
+        public ApiResult<U> ToResult<U>()
+        {
+            var res = new ApiResult<U>()
+            {
+                ErrorCode = ErrorCode,
+                ErrorText = ErrorText
+            };
+
+            return res;
+        }
+
         public ApiResult(StatusCode errorCode, string errorText)
         {
             ErrorCode = errorCode;

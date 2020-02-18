@@ -57,26 +57,26 @@ namespace TinyCrm.Core.Data
                 .Entity<Customer>()
                 .ToTable("Customer");              
             
-            modelBuilder
-                .Entity<Customer>()
-                .Property(c => c.VatNumber)
-                .HasMaxLength(9)
-                .IsRequired();             
+            //modelBuilder
+            //    .Entity<Customer>()
+            //    .Property(c => c.VatNumber)
+            //    .HasMaxLength(9)
+            //    .IsRequired();             
             
-            modelBuilder
-                .Entity<Customer>()
-                .HasIndex(c => c.VatNumber)
-                .IsUnique();
+            //modelBuilder
+            //    .Entity<Customer>()
+            //    .HasIndex(c => c.VatNumber)
+            //    .IsUnique();
 
-            modelBuilder
-                .Entity<Customer>()
-                .Property(c => c.Email)
-                .IsRequired();            
+            //modelBuilder
+            //    .Entity<Customer>()
+            //    .Property(c => c.Email)
+            //    .IsRequired();            
             
-            modelBuilder
-                .Entity<Customer>()
-                .Property(c => c.Status)
-                .IsRequired();
+            //modelBuilder
+            //    .Entity<Customer>()
+            //    .Property(c => c.Status)
+            //    .IsRequired();
 
             /// <summary>
             /// Order Model Builder

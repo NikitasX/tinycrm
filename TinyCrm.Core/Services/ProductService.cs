@@ -39,32 +39,44 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public async Task<bool> AddProduct(AddProductOptions options)
+        public async Task<ApiResult<Product>> AddProduct(AddProductOptions options)
         {
             if (options == null) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Null {options}");
             }
 
             if (string.IsNullOrWhiteSpace(options.Id)) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Null {options.Id}");
             }
 
             var product = await GetProductById(options.Id);
-            
-            if (product.Data != null) {
-                return false;
+
+            if (product.ErrorCode != StatusCode.NotFound) {
+                return new ApiResult<Product>(
+                    StatusCode.NotFound,
+                    $"Product found in database");
             }
 
             if (string.IsNullOrWhiteSpace(options.Name)) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Product name cannot be null or whitespace");
             }
 
             if (options.Price <= 0) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Price cannot be 0");
             }
 
             if (options.Category == ProductCategory.Invalid) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Category not set");
             }
 
             product.Data = new Product()
@@ -84,10 +96,12 @@ namespace TinyCrm.Core.Services
             try {
                 success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
-                //
+                return new ApiResult<Product>(
+                    StatusCode.InternalServerError,
+                    $"Product not added {e}");
             }
 
-            return success;
+            return ApiResult<Product>.CreateSuccess(product.Data);
         }
 
         /// <summary>
@@ -96,22 +110,28 @@ namespace TinyCrm.Core.Services
         /// <param name="productId"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateProduct(string productId, 
+        public async Task<ApiResult<Product>> UpdateProduct(string productId, 
             UpdateProductOptions options)
         {
 
             if (options == null) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Null {options}");
             }
 
             if(string.IsNullOrWhiteSpace(productId)) {
-                return false;
+                return new ApiResult<Product>(
+                    StatusCode.BadRequest,
+                    $"Null {productId}");
             }
 
             var product = await GetProductById(productId);
 
-            if (product.Data == null) {
-                return false;
+            if (product.ErrorCode == StatusCode.NotFound) {
+                return new ApiResult<Product>(
+                    StatusCode.NotFound,
+                    $"Product not found in database");
             }
 
             if (!string.IsNullOrWhiteSpace(options.Name)) {
@@ -141,10 +161,12 @@ namespace TinyCrm.Core.Services
             try {
                 success = await context.SaveChangesAsync() > 0;
             } catch (Exception e) {
-                //
+                return new ApiResult<Product>(
+                    StatusCode.InternalServerError,
+                    $"Something went wrong {e}");
             }
 
-            return success;
+            return ApiResult<Product>.CreateSuccess(product.Data);
         }
 
         /// <summary>
@@ -152,67 +174,56 @@ namespace TinyCrm.Core.Services
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public List<Product> SearchProduct(SearchProductOptions options)
+        public IQueryable<Product> SearchProduct(SearchProductOptions options)
         {
             if (options == null) {
                 return default;
             }
 
             var productList = context.Set<Product>()
-                .Take(100)
-                .ToList();
+                .AsQueryable();                
 
             if (!string.IsNullOrWhiteSpace(options.Id)) {
-                productList = productList
-                    .Where(p => p.Id == options.Id)
-                    .ToList();
-
-                return productList;
+                return productList = productList
+                    .Where(p => p.Id == options.Id);
             }
 
             if (!string.IsNullOrWhiteSpace(options.Name)) {
                 productList = productList
-                    .Where(p => p.Name.Contains(options.Name))
-                    .ToList();
+                    .Where(p => p.Name.Contains(options.Name));
             }
 
             if (!string.IsNullOrWhiteSpace(options.Description)) {
                 productList = productList
-                    .Where(p => p.Description.Contains(options.Description))
-                    .ToList();
+                    .Where(p => p.Description.Contains(options.Description));
             }
 
             if (options.Category != ProductCategory.Invalid) {
                 productList = productList
-                    .Where(p => p.Category == options.Category)
-                    .ToList();
+                    .Where(p => p.Category == options.Category);
             }
 
             if (options.MinPrice != 0) {
                 productList = productList
-                    .Where(p => p.Price > options.MinPrice)
-                    .ToList();
+                    .Where(p => p.Price > options.MinPrice);
             }
 
             if (options.MaxPrice != 0) {
                 productList = productList
-                    .Where(p => p.Price < options.MaxPrice)
-                    .ToList();
+                    .Where(p => p.Price < options.MaxPrice);
             }
 
             if (options.MinDiscount != 0) {
                 productList = productList
-                    .Where(p => p.Discount > options.MinDiscount)
-                    .ToList();
+                    .Where(p => p.Discount > options.MinDiscount);
             }
 
             if (options.MaxDiscount != 0) {
                 productList = productList
-                    .Where(p => p.Discount < options.MaxDiscount)
-                    .ToList();
+                    .Where(p => p.Discount < options.MaxDiscount);
             }
 
-            return productList;
+            return productList.Take(500);
         }
 
         /// <summary>
@@ -223,7 +234,7 @@ namespace TinyCrm.Core.Services
         public async Task<ApiResult<Product>> GetProductById(string productId)
         {
             if(string.IsNullOrWhiteSpace(productId)) {
-                return default;
+                return new ApiResult<Product>(StatusCode.BadRequest, $"Null {productId}");
             }
 
             var product = await context
