@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Core.Registration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TinyCrm.Core;
 
 namespace TinyCrm.Web
 {
@@ -24,6 +27,11 @@ namespace TinyCrm.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterModule(new ServiceRegistrator());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

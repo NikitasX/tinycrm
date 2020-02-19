@@ -1,16 +1,20 @@
 ﻿using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace TinyCrm.Core.Services
 {
     public interface IProductService
     {
-        bool AddProduct(AddProductOptions options);
+        Task<ApiResult<Product>> AddProduct(AddProductOptions options);
 
-        bool UpdateProduct(string productId, UpdateProductOptions options);
+        Task<ApiResult<Product>> UpdateProduct(string productId, UpdateProductOptions options);
 
-        Product GetProductById(string productId);
+        IQueryable<Product> SearchProduct(SearchProductOptions options);
+
+        Task<ApiResult<Product>> GetProductById(string productId);
 
         Dictionary<string, string> ParseCSV(string csvURL);
     }

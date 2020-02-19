@@ -1,14 +1,15 @@
 ﻿using Xunit;
 using TinyCrm.Core.Model.Options;
+using System.Threading.Tasks;
 
 namespace TinyCrm.Tests
 {
     public partial class ProductServiceTests
     {
         [Fact]
-        public void UpdateProduct_Success()
+        public async Task UpdateProduct_SuccessAsync()
         {
-            var productId = "SKU8";
+            var productId = "1450001164";
             var updateProductOptions = new UpdateProductOptions()
             {
                 Name = "Pocophone F1",
@@ -18,15 +19,17 @@ namespace TinyCrm.Tests
                 Category = Core.Model.ProductCategory.Smartphones
             };
 
-            Assert.True(psvc_.UpdateProduct(productId, updateProductOptions));
+            var temp = await psvc_.UpdateProduct(productId, updateProductOptions);
 
-            var dProduct = psvc_.GetProductById(productId);
+            Assert.True(temp.Success);
 
-            Assert.Equal(updateProductOptions.Name, dProduct.Name);
-            Assert.Equal(updateProductOptions.Price, dProduct.Price);
-            Assert.Equal(updateProductOptions.Discount, dProduct.Discount);
-            Assert.Equal(updateProductOptions.Description, dProduct.Description);
-            Assert.Equal(updateProductOptions.Category, dProduct.Category);
+            var dProduct = await psvc_.GetProductById(productId);
+
+            Assert.Equal(updateProductOptions.Name, dProduct.Data.Name);
+            Assert.Equal(updateProductOptions.Price, dProduct.Data.Price);
+            Assert.Equal(updateProductOptions.Discount, dProduct.Data.Discount);
+            Assert.Equal(updateProductOptions.Description, dProduct.Data.Description);
+            Assert.Equal(updateProductOptions.Category, dProduct.Data.Category);
         }
     }
 }

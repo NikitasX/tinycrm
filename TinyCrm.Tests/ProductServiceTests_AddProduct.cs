@@ -1,17 +1,18 @@
 using Xunit;
 using System;
 using TinyCrm.Core.Model;
+using System.Threading.Tasks;
 
 namespace TinyCrm.Tests
 {
     public partial class ProductServiceTests : IDisposable
     {
         [Fact]
-        public void AddProduct_Success()
+        public async Task AddProduct_Success()
         {
             var productId = $"SKU{DateTime.Now.Millisecond}";
 
-            var validate = psvc_.AddProduct(new Core.Model.Options.AddProductOptions()
+            var validate = await psvc_.AddProduct(new Core.Model.Options.AddProductOptions()
             {
                 Id = productId,
                 Name = "Sony Tv",
@@ -21,22 +22,22 @@ namespace TinyCrm.Tests
                 Category = Core.Model.ProductCategory.Televisions
             });
 
-            Assert.True(validate);
+            Assert.True(validate.Success);
 
-            var product = psvc_.GetProductById(productId);
-            Assert.NotNull(product);
+            var product = await psvc_.GetProductById(productId);
+            Assert.NotNull(product.Data);
 
-            Assert.Equal("Sony Tv", product.Name);
-            Assert.Equal(399.88M, product.Price);
-            Assert.Equal(Core.Model.ProductCategory.Televisions, product.Category);
+            Assert.Equal("Sony Tv", product.Data.Name);
+            Assert.Equal(399.88M, product.Data.Price);
+            Assert.Equal(Core.Model.ProductCategory.Televisions, product.Data.Category);
         }
 
         [Fact]
-        public void AddProduct_Failure_Invalid_Category()
+        public async Task AddProduct_Failure_Invalid_Category()
         {
             var productId = $"SKU{DateTime.Now.Millisecond}";
 
-            var validate = psvc_.AddProduct(new Core.Model.Options.AddProductOptions()
+            var validate = await psvc_.AddProduct(new Core.Model.Options.AddProductOptions()
             {
                 Id = productId,
                 Name = "Sony Tv",
@@ -46,11 +47,11 @@ namespace TinyCrm.Tests
                 //Category = Core.Model.ProductCategory.Invalid
             });
 
-            Assert.False(validate);
+            Assert.False(validate.Success);
         }
 
         [Fact]
-        public void AddProduct_From_Csv()
+        public async Task AddProduct_From_Csv()
         {
             var productList = psvc_.ParseCSV("C:/Users/KCA4/devel/TinyCrm/products.csv");
 
@@ -66,7 +67,7 @@ namespace TinyCrm.Tests
                     Category = Core.Model.ProductCategory.Laptops
                 });
 
-                context_.SaveChanges();
+                await context_.SaveChangesAsync();
             }
         }
 

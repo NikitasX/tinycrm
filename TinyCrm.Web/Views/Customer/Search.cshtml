@@ -1,0 +1,86 @@
+﻿@model TinyCrm.Web.Models.SearchCustomerViewModel
+
+@{
+    if (Model != null && Model.CustomerList != null) {
+        <div class="text-center">
+            <h4 class="display-4">Customers List</h4>
+            <table class="table table-striped table-responsive">
+                <thead>
+                    <tr>
+                        <td>
+                            Customer Id
+                        </td>
+                        <td>
+                            Customer First Name
+                        </td>
+                        <td>
+                            Customer Last Name
+                        </td>
+                        <td>
+                            Customer Email
+                        </td>                        
+                        <td>
+                            Customer Vat
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var customer in Model.CustomerList) {
+                            <tr>
+                                <td>@customer.Id</td>
+                                <td>@customer.Firstname</td>
+                                <td>@customer.Lastname</td>
+                                <td>@customer.Email</td>                                
+                                <td>@customer.VatNumber</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+<form method="post" action="@Url.Action("search", "customer")">
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Id)">Customer Id</label>
+        @Html.TextBoxFor(c => c.SearchOptions.Id, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Email)">Email</label>
+        @Html.TextBoxFor(c => c.SearchOptions.Email, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.VatNumber)">Vat Number</label>
+        @Html.TextBoxFor(c => c.SearchOptions.VatNumber, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label for="@Html.IdFor(c => c.SearchOptions.Country)">Country</label>
+
+        <select class="form-control" id="@Html.IdFor(c => c.SearchOptions.Country)" name="@Html.IdFor(c => c.SearchOptions.Country)">
+            @{
+                foreach (var country in Model.CountryList) {
+                    <option value="@country.CountryId">@country.CountryFullName</option>
+                }
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+    @if (!string.IsNullOrWhiteSpace(Model?.ErrorText)) {
+        <div class="alert alert-danger" role="alert">
+            @Model?.ErrorText
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model?.SuccessText)) {
+        <div class="alert alert-success" role="alert">
+            @Model?.SuccessText
+        </div>
+    }
+</form>

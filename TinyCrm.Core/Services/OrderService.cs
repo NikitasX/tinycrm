@@ -4,12 +4,15 @@ using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Model.Options;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace TinyCrm.Core.Services
 {
     public class OrderService : IOrderService
     {
         private readonly ICustomerService customers_;
+        private readonly IProductService products_;
         private readonly TinyCrmDbContext context_;
 
         /// <summary>
@@ -19,21 +22,23 @@ namespace TinyCrm.Core.Services
         /// <param name="context"></param>
         public OrderService(
             ICustomerService customers,
+            IProductService products,
             TinyCrmDbContext context)
         {
             context_ = context;
             customers_ = customers;
+            products_ = products;
         }
 
-        public Order CreateOrder(int customerId, ICollection<string> productIds)
+        public async Task<ApiResult<Order>> CreateOrder(int customerId, ICollection<string> productIds)
         {
-            if(customerId <= 0) {
-                return null;
-            }            
-            
-            if(productIds == null ||
+            if (customerId <= 0) {
+                return new ApiResult<Order>(StatusCode.BadRequest, "Invalid customer Id");
+            }
+
+            if (productIds == null ||
                 productIds.Count == 0) {
-                return null;
+                return new ApiResult<Order>(StatusCode.BadRequest, "Invalid or empty product list");
             }
 
             productIds = productIds
@@ -41,24 +46,25 @@ namespace TinyCrm.Core.Services
                 .ToList();
 
             var customer = customers_.SearchCustomer(
-                new SearchCustomerOptions() { 
+                new SearchCustomerOptions()
+                {
                     Id = customerId
                 })
                 .Where(c => c.Status == true)
                 .SingleOrDefault();
 
-            if(customer == null) {
-                return null;
+            if (customer == null) {
+                return new ApiResult<Order>(StatusCode.NotFound, "Customer not found in database");
             }
 
-            var products = context_
+            var products = await context_
                 .Set<Product>()
                 .Where(p => productIds.Contains(p.Id))
                 .Distinct()
-                .ToList();
+                .ToListAsync();
 
             if (products.Count != productIds.Count) {
-                return null;
+                return new ApiResult<Order>(StatusCode.BadRequest, "Not all product Ids found in database");
             }
 
             var order = new Order()
@@ -66,7 +72,7 @@ namespace TinyCrm.Core.Services
                 Customer = customer
             };
 
-            foreach(var p in products) {
+            foreach (var p in products) {
                 order.Products.Add(
                     new OrderProduct()
                     {
@@ -76,19 +82,19 @@ namespace TinyCrm.Core.Services
             context_.Add(order);
             try {
                 context_.SaveChanges();
-            } catch (Exception) {
-                return null;
+            } catch (Exception e) {
+                return new ApiResult<Order>(StatusCode.InternalServerError, $"Something went wrong {e}");
             }
 
-            return order;
+            return ApiResult<Order>.CreateSuccess(order);
         }
 
-        public Order GetOrderById(int orderId)
+        public async Task<Order> GetOrderById(int orderId)
         {
             throw new NotImplementedException();
         }
 
-        public string UpdateOrder(int orderId, UpdateOrderOptions options)
+        public async Task<string> UpdateOrder(int orderId, UpdateOrderOptions options)
         {
             throw new NotImplementedException();
         }

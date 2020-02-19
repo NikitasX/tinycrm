@@ -5,6 +5,8 @@ using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Services;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace TinyCrm.Tests
 {
@@ -25,9 +27,9 @@ namespace TinyCrm.Tests
         }
 
         [Fact]
-        public void CreateOrder_Success()
+        public async Task CreateOrder_Success()
         {
-            var customerId = 6;
+            var customerId = 1;
             var productIds = new List<string>()
             {
                 "1480000010",
@@ -38,13 +40,13 @@ namespace TinyCrm.Tests
                 "1480051324"
             };
 
-            var addOrder = orders_.CreateOrder(customerId, productIds);
+            var addOrder = await orders_.CreateOrder(customerId, productIds);
 
             Assert.NotNull(addOrder);
 
-            Assert.True(context_
+            Assert.True(await context_
                 .Set<OrderProduct>()
-                .All(op => productIds.Contains(op.ProductId)));
+                .AllAsync(op => productIds.Contains(op.ProductId)));
         }
     }
 }
